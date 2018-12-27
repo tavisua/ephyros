@@ -103,86 +103,8 @@ class ActionsController extends Controller
 							    break;
 					    }
 					    $listIdBuilder->whereIn("date($fieldName)", $filter[$key]);
-				    }else{
-//					    switch($key){
-//						    case 'c_subdiv_id':{
-//							    $sql_tmp = "select `llx_actioncomm`.id from `llx_actioncomm`
-//                            inner join `llx_user` on `llx_actioncomm`.`fk_user_author` = `llx_user`.rowid
-//                            where 1 and `llx_actioncomm`.`fk_action` = $id
-//                            and`llx_user`.`subdiv_id` = ".$filter[$key]."
-//                            and `llx_actioncomm`.percent <> 100
-//                            and `llx_actioncomm`.`active` = 1";
-//						    }break;
-//						    case 'p_subdiv_id':{
-//							    $sql_tmp = "select distinct `llx_actioncomm`.id from `llx_actioncomm`
-//                                    left join `llx_actioncomm_resources` on `llx_actioncomm`.id = `llx_actioncomm_resources`.`fk_actioncomm`
-//                                    inner join `llx_user` on case when `llx_actioncomm_resources`.`fk_element` is null then `llx_actioncomm`.`fk_user_action`else `llx_actioncomm`.`fk_user_action` end = `llx_user`.rowid
-//                                    where 1 and `llx_actioncomm`.`fk_action` = $id
-//                                    and`llx_user`.`subdiv_id` =  ".$filter[$key]."
-//                                    and `llx_actioncomm`.percent <> 100
-//                                    and `llx_actioncomm`.`active` = 1";
-//						    }break;
-//						    case 'customer': {
-//							    $sql .= " and `fk_user_author` = ".$filter[$key];
-//						    }break;
-//						    case 'groupoftaskID': {
-//							    $sql .= " and fk_groupoftask = ".$filter[$key];
-//							    $sql .= " and `llx_actioncomm`.`active` = 1
-//                                  and `llx_actioncomm`.`percent` <> 100";
-//						    }break;
-//						    case 'performer':{
-//							    if(!empty($filter[$key])) {
-//								    $sql_tmp = "";
-//								    if ($filter[$key] != -1)
-//									    $sql_tmp = "select distinct `llx_actioncomm`.id from `llx_actioncomm`
-//                                        left join `llx_actioncomm_resources` on `llx_actioncomm`.id = `llx_actioncomm_resources`.`fk_actioncomm`
-//                                        where 1
-//                                        and case when `llx_actioncomm_resources`.`fk_element` is null then `llx_actioncomm`.`fk_user_action`else `llx_actioncomm_resources`.`fk_element` end  = " . $filter[$key] . "
-//                                        and `llx_actioncomm`.percent <> 100
-//                                        and `llx_actioncomm`.`active` = 1";
-//								    else {
-//									    $sql_tmp = "select rowid from llx_user
-//                                            where subdiv_id = " . $user->subdiv_id ;
-//									    $res = $db->query($sql_tmp);
-//									    $users_id = array(0);
-//									    while ($obj = $db->fetch_object($res)) {
-//										    $users_id[] = $obj->rowid;
-//									    }
-//									    $sql_tmp = "select distinct `llx_actioncomm`.id from `llx_actioncomm`
-//                                        left join `llx_actioncomm_resources` on `llx_actioncomm`.id = `llx_actioncomm_resources`.`fk_actioncomm`
-//                                        where 1
-//                                        and case when `llx_actioncomm_resources`.`fk_element` is null then `llx_actioncomm`.`fk_user_action`else `llx_actioncomm_resources`.`fk_element` end  in (" . implode(',', $users_id) . ")
-//                                        and `llx_actioncomm`.percent <> 100
-//                                        and `llx_actioncomm`.`active` = 1";
-//								    }
-//							    }
-//
-//						    }break;
-//					    }
-//					    if(in_array($key,array('p_subdiv_id','c_subdiv_id','performer'))&&!empty($filter[$key])){//Фільтр по підрозділам замовника, виконавця та по виконавцю
-//						    $res_tmp = $db->query($sql_tmp);
-//						    $ID = array(0);
-//						    while($obj = $db->fetch_object($res_tmp)){
-//							    $ID[]=$obj->id;
-//						    }
-//						    $sql.=" and `llx_actioncomm`.`id` in (".implode(',',$ID).")";
-//					    }
-//					    if(in_array($key,array('lastaction','futureaction'))){//остання і майбутня дія відповідального
-//						    $sql_tmp = "select `llx_actioncomm`.`id` from `llx_societe_action`
-//                        inner join `llx_actioncomm` on `llx_actioncomm`.`id` = `llx_societe_action`.`action_id`
-//                        where 1
-//                        and dtChange in (".$filter[$key].")
-//                        and `llx_actioncomm`.`fk_action` = $id
-//                        and `llx_actioncomm`.`active` = 1
-//                        and `llx_actioncomm`.`percent` <> 100";
-//						    $res_tmp = $db->query($sql_tmp);
-//						    $ID = array(0);
-//						    while($obj = $db->fetch_object($res_tmp)){
-//							    $ID[]=$obj->id;
-//						    }
-//						    $sql.=" and `llx_actioncomm`.`id` in (".implode(',',$ID).")";
-//					    }
 				    }
+
 			    }
 
 		    }
@@ -284,20 +206,9 @@ class ActionsController extends Controller
 		           ->select('rowid','pass')
 		           ->where('active','=',1)->get();
 		foreach ($users as $key=>$pass){
-//			dd($pass->pass);
-//			dd(app('hash')->make('test',[]));
 			DB::connection("mysql")->update('update llx_user set `pass_crypted` = "'.bcrypt($pass->pass).'" where rowid = '.$pass->rowid);
 		}
 	}
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /*Возвращает список пользователей, задействованных в задаче
      * @param int
@@ -326,7 +237,6 @@ class ActionsController extends Controller
 		}
 		$out .= ' }';
 		$out = json_decode($out, true);
-//		dump($out);
 		return $out;
 	}
 
@@ -416,60 +326,4 @@ class ActionsController extends Controller
 
 		return $chain_actions;
 	}
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }
